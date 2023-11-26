@@ -1,5 +1,7 @@
 # Discord bot integrating Kagi's summarization AI
 
+![image](https://github.com/cmeadowstech/KagiDB/assets/30964870/40acef30-01fa-452e-b848-9cb146d28ea9)
+
 ## Install requirements
 
 First, install the pip requirements.
