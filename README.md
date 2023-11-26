@@ -17,7 +17,8 @@ Requires a Kagi session token, which can be found under Settings -> Account -> S
 Then, create a .env file with the following:
 
 ```
-TOKEN=<Kagi token>
+DISCORD_TOKEN=<discord bot token>
+KAGI_TOKEN=<kagi token>
 ```
 
 ## Discord Bot

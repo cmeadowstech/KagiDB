@@ -1,6 +1,6 @@
 import requests
 import os
-import pprint
+import pprint, textwrap
 import json
 import discord
 from dotenv import load_dotenv
@@ -17,8 +17,7 @@ def get_kagi_sum(article, summary_type):
 
     payload = {"summary_type": summary_type.lower(), "url": article}
     headers = {
-        "Authorization": "GwDAbP3QUQU.gN_TrLK59kbRXNafxk8ddpUF0G_18ksWEKO6aMxuoNs",
-        "Cookie": "kagi_session=GwDAbP3QUQU.gN_TrLK59kbRXNafxk8ddpUF0G_18ksWEKO6aMxuoNs",
+        "Authorization": os.getenv("KAGI_TOKEN"),
     }
 
     response = requests.request("GET", url, headers=headers, params=payload)
@@ -75,9 +74,31 @@ async def sum(
 ):
     await interaction.response.defer()
     summary = get_kagi_sum(url, summary_type)
-    await interaction.followup.send(
-        f"Here's your summary for the article {url}:\n\n{summary['output_data']['markdown']}"
+    try:
+        summary = summary["output_data"]["markdown"]
+    except:
+        summary = "Oops, something went wrong. Please make sure the url is valid and try again."
+
+    embed = discord.Embed(
+        title=url,
+        type="rich",
+        color=0xFFB319,
+        url=url,
     )
 
+    if summary_type.lower() == "takeaway":
+        points = summary.split("\n")
+        for p in points:
+            embed.add_field(name="-------", value=p[3:], inline=False)
+    else:
+        embed.add_field(name="Summary", value=summary, inline=False)
 
-client.run(os.getenv("TOKEN"))
+    embed.set_footer(
+        icon_url="https://help.kagi.com/assets/kagi-logo.f29e5d62.png",
+        text="Summary created by Kagi Summarizer - https://kagi.com/summarizer/index.html",
+    )
+
+    await interaction.followup.send(embed=embed)
+
+
+client.run(os.getenv("DISCORD_TOKEN"))
