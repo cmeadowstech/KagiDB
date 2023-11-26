@@ -1,5 +1,5 @@
 import requests
-import os
+import os, re
 import pprint, textwrap
 import json
 import discord
@@ -16,6 +16,17 @@ def get_kagi_sum(article, summary_type):
     url = "https://kagi.com/mother/summary_labs"
 
     payload = {"summary_type": summary_type.lower(), "url": article}
+    headers = {
+        "Authorization": os.getenv("KAGI_TOKEN"),
+    }
+
+    response = requests.request("GET", url, headers=headers, params=payload)
+    return json.loads((response.text))
+
+def get_kagi_qa(query):
+    url = "https://kagi.com/mother/context"
+
+    payload = {"q": query, "qa": "true"}
     headers = {
         "Authorization": os.getenv("KAGI_TOKEN"),
     }
@@ -100,5 +111,35 @@ async def sum(
 
     await interaction.followup.send(embed=embed)
 
+@client.tree.command(
+    description="Usese Kagi's quick answer",
+)
+@app_commands.describe(
+    query="What would you like to search for?",
+)
+async def qa(
+    interaction: discord.Interaction,
+    query: str,
+):
+    await interaction.response.defer()
+    answer = get_kagi_qa(query)
+    answer = answer["output_data"]["markdown"]
+
+    embed = discord.Embed(
+        title=f"Query: {query}",
+        description="Quick Answer:",
+        type="rich",
+        color=0xFFB319,
+    )
+
+    for p in answer.split('\n\n\n'):
+            embed.add_field(name="\u200b", value=p, inline=False)
+
+    embed.set_footer(
+        icon_url="https://help.kagi.com/assets/kagi-logo.f29e5d62.png",
+        text="Quick Answer provided by Kagi Search - https://kagi.com/",
+    )
+
+    await interaction.followup.send(embed=embed)
 
 client.run(os.getenv("DISCORD_TOKEN"))
