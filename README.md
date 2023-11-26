@@ -23,4 +23,3 @@ TOKEN=<Kagi token>
 You will also need to create a Discord Bot: https://discordpy.readthedocs.io/en/stable/discord.html
 - I believe this is a bit old and Discord now requires a redirect url. By default it should be https://discordapp.com/oauth2/authorize?&client_id=[CLIENTID]&scope=bot
   - Replace [CLIENTID] with the client id of your bot
-
